@@ -13,6 +13,10 @@ MAX_LIMIT = 90
     @amount = amount
   end
 
+  def deduct(amount)
+    @balance -= amount
+  end
+
   private
 
   def max_limit
