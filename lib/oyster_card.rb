@@ -1,3 +1,5 @@
+#require_relative "station" 
+
 class OysterCard
   attr_reader :balance, :in_journey, :current_journey, :journey_log
 
