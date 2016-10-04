@@ -2,7 +2,7 @@ require "oyster_card"
 
 describe OysterCard do
   subject(:oystercard) {described_class.new}
-  let (:station) {double('station', :name => "King's Cross")}
+  let (:station) {double('station', name: "King's Cross")}
 
   it "has a default balance of 0" do
     expect(oystercard.balance).to eq(0)
@@ -51,7 +51,7 @@ describe OysterCard do
     it "Saves the entry station when touching in" do
       oystercard.top_up(described_class::MINIMUM_BALANCE)
       oystercard.touch_in(station)
-      expect(oystercard.entry_station).to eq station.name
+      expect(oystercard.current_journey[:entry_station]).to eq station.name
     end
   end
 
@@ -63,5 +63,11 @@ describe OysterCard do
       expect(oystercard.in_journey?).to eq false
     end
 
+    it "sets entry station to nil" do
+      oystercard.top_up(described_class::MINIMUM_BALANCE)
+      oystercard.touch_in(station)
+      oystercard.touch_out
+      expect(oystercard.entry_station).to be nil
+    end
 
 end
