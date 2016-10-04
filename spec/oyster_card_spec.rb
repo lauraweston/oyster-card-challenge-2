@@ -3,6 +3,7 @@ require "oyster_card"
 describe OysterCard do
   subject(:oystercard) {described_class.new}
   let (:station) {double('station', name: "King's Cross")}
+  let (:station2) {double('station2', name: "Holborn")}
 
   it "has a default balance of 0" do
     expect(oystercard.balance).to eq(0)
@@ -26,7 +27,7 @@ describe OysterCard do
   context "#deduct" do
     it "Touching out should deduct correct amount from card" do
       oystercard.top_up(described_class::MINIMUM_BALANCE+1)
-      expect{oystercard.touch_out}.to change{oystercard.balance}.by(-described_class::MINIMUM_FARE)
+      expect{oystercard.touch_out(station)}.to change{oystercard.balance}.by(-described_class::MINIMUM_FARE)
     end
 
   end
@@ -59,15 +60,28 @@ describe OysterCard do
     it "Touching out changes in_journey variable to false" do
       oystercard.top_up(described_class::MINIMUM_BALANCE)
       oystercard.touch_in(station)
-      oystercard.touch_out
+      oystercard.touch_out(station)
       expect(oystercard.in_journey?).to eq false
     end
 
-    it "sets entry station to nil" do
+    it "Sets entry station to nil" do
       oystercard.top_up(described_class::MINIMUM_BALANCE)
       oystercard.touch_in(station)
-      oystercard.touch_out
-      expect(oystercard.entry_station).to be nil
+      oystercard.touch_out(station2)
+      expect(oystercard.current_journey[:entry_station]).to be nil
     end
 
+    it "Set exit station hash key to exit station" do
+      oystercard.top_up(described_class::MINIMUM_BALANCE)
+      oystercard.touch_in(station)
+      oystercard.touch_out(station2)
+      expect(oystercard.journey_log[0][:exit_station]).to eq station2.name
+    end
+
+    it "Touching out updates journey log" do
+      oystercard.top_up(described_class::MINIMUM_BALANCE)
+      oystercard.touch_in(station)
+      oystercard.touch_out(station2)
+      expect(oystercard.journey_log[0]).to include(entry_station: station.name, exit_station: station2.name)
+    end
 end
