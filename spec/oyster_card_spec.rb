@@ -18,9 +18,7 @@ describe OysterCard do
     end
 
     it "prevents top up above 90" do
-      MAX_LIMIT = 90
-      oystercard.top_up(90)
-      expect{oystercard.top_up(1)}.to raise_error("The maximum amount allowed on the card is £90")
+      expect{oystercard.top_up(OysterCard::MAX_LIMIT+1)}.to raise_error("The maximum amount allowed on the card is £90")
     end
   end
 
@@ -44,15 +42,23 @@ describe OysterCard do
 
   context "#touch_in" do
     it "Touching in changes in_journey variable to true" do
+      oystercard.top_up(OysterCard::MINIMUM_BALANCE)
       oystercard.touch_in
       expect(oystercard.in_journey?).to eq true
+    end
+
+    it "Cannot touch_in if balance less than minimum balance", :focus do
+      expect{oystercard.touch_in}.to raise_error "You don't have enough money"
     end
   end
 
   context "#touch_out"
     it "Touching out changes in_journey variable to false" do
+      oystercard.top_up(OysterCard::MINIMUM_BALANCE)
       oystercard.touch_in
       oystercard.touch_out
       expect(oystercard.in_journey?).to eq false
     end
+
+
 end
