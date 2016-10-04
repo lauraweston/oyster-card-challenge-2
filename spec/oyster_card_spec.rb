@@ -18,20 +18,16 @@ describe OysterCard do
     end
 
     it "prevents top up above 90" do
-      expect{oystercard.top_up(OysterCard::MAX_LIMIT+1)}.to raise_error("The maximum amount allowed on the card is £90")
+      expect{oystercard.top_up(described_class::MAX_LIMIT+1)}.to raise_error("The maximum amount allowed on the card is £90")
     end
   end
 
   context "#deduct" do
-    it "responds to deduct" do
-      expect(oystercard).to respond_to(:deduct).with(1).argument
+    it "Touching out should deduct correct amount from card" do
+      oystercard.top_up(described_class::MINIMUM_BALANCE+1)
+      expect{oystercard.touch_out}.to change{oystercard.balance}.by(-described_class::MINIMUM_FARE)
     end
 
-    it "deducts fare" do
-      oystercard.top_up(20) # replace with stub
-      oystercard.deduct(10)
-      expect(oystercard.balance).to eq(10)
-    end
   end
 
   context "#in_journey?" do
@@ -42,7 +38,7 @@ describe OysterCard do
 
   context "#touch_in" do
     it "Touching in changes in_journey variable to true" do
-      oystercard.top_up(OysterCard::MINIMUM_BALANCE)
+      oystercard.top_up(described_class::MINIMUM_BALANCE)
       oystercard.touch_in
       expect(oystercard.in_journey?).to eq true
     end
@@ -54,7 +50,7 @@ describe OysterCard do
 
   context "#touch_out"
     it "Touching out changes in_journey variable to false" do
-      oystercard.top_up(OysterCard::MINIMUM_BALANCE)
+      oystercard.top_up(described_class::MINIMUM_BALANCE)
       oystercard.touch_in
       oystercard.touch_out
       expect(oystercard.in_journey?).to eq false

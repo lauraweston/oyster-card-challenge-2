@@ -3,6 +3,7 @@ class OysterCard
 
   MAX_LIMIT = 90
   MINIMUM_BALANCE = 1
+  MINIMUM_FARE = 1
 
   def initialize
       @balance = 0
@@ -14,9 +15,7 @@ class OysterCard
     @balance += amount
   end
 
-  def deduct(amount)
-    @balance -= amount
-  end
+
 
   def in_journey?
     in_journey
@@ -27,11 +26,15 @@ class OysterCard
     @in_journey = true
   end
 
-  def touch_out
+  def touch_out(fare = MINIMUM_BALANCE)
+    deduct(fare)
     @in_journey = false
   end
 
   private
+  def deduct(amount)
+    @balance -= amount
+  end
 
   def max_limit
     "The maximum amount allowed on the card is £#{MAX_LIMIT}"
