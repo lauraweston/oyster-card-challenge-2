@@ -1,9 +1,11 @@
 require "oyster_card"
 
+
 describe OysterCard do
   subject(:oystercard) {described_class.new}
   let (:station) {double('station', name: "King's Cross")}
   let (:station2) {double('station2', name: "Holborn")}
+  let (:journey) {double :journey }
 
   it "has a default balance of 0" do
     expect(oystercard.balance).to eq(0)
@@ -25,9 +27,10 @@ describe OysterCard do
   end
 
   context "#deduct" do
-    xit "Touching out should deduct correct amount from card" do
+    it "Touching out should deduct correct amount from card" do
       oystercard.top_up(described_class::MINIMUM_BALANCE+1)
-      expect{oystercard.touch_out(station)}.to change{oystercard.balance}.by(-described_class::MINIMUM_FARE)
+      oystercard.touch_in(station)
+      expect{oystercard.touch_out(station2)}.to change{oystercard.balance}.by(-Journey::MINIMUM_FARE)
     end
 
   end
@@ -39,11 +42,11 @@ describe OysterCard do
   end
 
   context "#touch_in" do
-    # it "Touching in changes in_journey variable to true" do
-    #   oystercard.top_up(described_class::MINIMUM_BALANCE)
-    #   oystercard.touch_in(station)
-    #   expect(oystercard.in_journey?).to eq true
-    # end
+    it "Touching in changes in_journey variable to true" do
+      oystercard.top_up(described_class::MINIMUM_BALANCE)
+      oystercard.touch_in(station)
+      expect(oystercard.in_journey?).to eq true
+    end
 
     it "Cannot touch_in if balance less than minimum balance" do
       expect{oystercard.touch_in(station)}.to raise_error "You don't have enough money"
@@ -64,7 +67,7 @@ describe OysterCard do
 
   context "#touch_out"
 
-    xit "Touching out changes in_journey variable to false" do
+    it "Touching out changes in_journey variable to false" do
       oystercard.top_up(described_class::MINIMUM_BALANCE)
       oystercard.touch_in(station)
       oystercard.touch_out(station)
