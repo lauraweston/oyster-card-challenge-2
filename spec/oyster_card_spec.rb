@@ -33,59 +33,65 @@ describe OysterCard do
       expect{oystercard.touch_out(station2)}.to change{oystercard.balance}.by(-Journey::MINIMUM_FARE)
     end
 
-  end
-
-  context "#in_journey?" do
-    it "Initialized not in a journey" do
-      expect(oystercard.in_journey?).to eq false
-    end
-  end
-
-  context "#touch_in" do
-    it "Touching in changes in_journey variable to true" do
-      oystercard.top_up(described_class::MINIMUM_BALANCE)
-      oystercard.touch_in(station)
-      expect(oystercard.in_journey?).to eq true
-    end
-
     it "Cannot touch_in if balance less than minimum balance" do
       expect{oystercard.touch_in(station)}.to raise_error "You don't have enough money"
     end
 
-    it "Touching in instantiates a new journey with station name" do
+    it "Touching in sets entry station with station" do
       oystercard.top_up(described_class::MINIMUM_BALANCE)
-      journey = oystercard.touch_in(station)
-      expect(journey).to be_a Journey
+      oystercard.touch_in(station)
+      expect(oystercard.current_journey.entry_station).to be station
     end
 
     it "Saves the entry station when touching in" do
       oystercard.top_up(described_class::MINIMUM_BALANCE)
       oystercard.touch_in(station)
-      expect(oystercard.current_journey.entry_station).to eq station.name
+      expect(oystercard.current_journey.entry_station).to be station
     end
   end
 
-  context "#touch_out"
-
-    it "Touching out changes in_journey variable to false" do
+  context "#touch_out" do
+    before do
       oystercard.top_up(described_class::MINIMUM_BALANCE)
       oystercard.touch_in(station)
-      oystercard.touch_out(station)
-      expect(oystercard.in_journey?).to eq false
+      oystercard.touch_out(station2)
     end
 
     it "Sets current journey to nil" do
-      oystercard.top_up(described_class::MINIMUM_BALANCE)
-      oystercard.touch_in(station)
-      oystercard.touch_out(station2)
-      expect(oystercard.current_journey).to be nil
+      expect(oystercard.current_journey).to have_attributes(entry_station: nil, exit_station: nil)
     end
 
     it "Touching out updates journey log with journey (entry and exit station)" do
-      oystercard.top_up(described_class::MINIMUM_BALANCE)
-      oystercard.touch_in(station)
-      oystercard.touch_out(station2)
-      expect(oystercard.journey_log.last.entry_station).to be station.name
-      expect(oystercard.journey_log.last.exit_station).to be station2.name
+      expect(oystercard.journey_log.last.entry_station).to be station
+      expect(oystercard.journey_log.last.exit_station).to be station2
     end
+  end
+
+  context "Touching out without touching in" do
+    it "Touching out without touching in incurs a penalty charge" do
+      expect{oystercard.touch_out(station2)}.to change{oystercard.balance}.by(-Journey::PENALTY_FARE)
+    end
+
+    it "Touching out without touching in resets current_journey" do
+      oystercard.touch_out(station2)
+      expect(oystercard.current_journey).to have_attributes(entry_station: nil, exit_station: nil)
+    end
+
+    it "Touching out updates journey log with journey (entry and exit station)" do
+      oystercard.touch_out(station2)
+      expect(oystercard.journey_log.last.entry_station).to be nil
+      expect(oystercard.journey_log.last.exit_station).to be station2
+    end
+  end
+
+  context "Touching in twice" do
+    before do
+      oystercard.top_up(described_class::MAX_LIMIT)
+      oystercard.touch_in(station)
+    end
+
+    it "Touching in twice incurs a penalty charge for the first journey" do
+      expect{oystercard.touch_in(station2)}.to change{oystercard.balance}.by(-Journey::PENALTY_FARE)
+    end
+  end
 end
