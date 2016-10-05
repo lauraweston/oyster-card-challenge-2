@@ -1,5 +1,5 @@
 #require_relative "station"
-#require_relative "journey"
+require_relative "journey"
 
 class OysterCard
   attr_reader :balance, :in_journey, :current_journey, :journey_log
@@ -11,7 +11,7 @@ class OysterCard
   def initialize
       @balance = 0
       @in_journey = false
-      @current_journey = {entry_station: nil, exit_station: nil}
+      @current_journey = nil
       @journey_log = []
   end
 
@@ -20,25 +20,25 @@ class OysterCard
     @balance += amount
   end
 
-
-
   def in_journey?
-    !!@current_journey[:entry_station]
+    !@current_journey.nil?
   end
 
   def touch_in(station)
     raise "You don't have enough money" if insufficient_funds?
-    add_entry_station(station)
+    #add_entry_station(station)
+    new_journey(station)
   end
 
   def touch_out(station, fare = MINIMUM_BALANCE)
+    current_journey.exit_station = station.name
     deduct(fare)
-    @current_journey[:exit_station] = station.name
     update_log(@current_journey)
     clear_current_journey
   end
 
   private
+
   def deduct(amount)
     @balance -= amount
   end
@@ -55,19 +55,19 @@ class OysterCard
     @balance < MINIMUM_BALANCE
   end
 
-  def add_entry_station(station)
-    @current_journey[:entry_station] = station.name
+  def new_journey(station)
+    @current_journey = Journey.new(station)
   end
 
   def delete_entry_station
     @current_journey[:entry_station] = nil
   end
 
-  def update_log(journey_hash)
-    @journey_log.push(journey_hash)
+  def update_log(journey)
+    @journey_log << journey
   end
 
   def clear_current_journey
-    @current_journey = {entry_station: nil, exit_station: nil}
+    @current_journey = nil
   end
 end

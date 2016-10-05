@@ -1,13 +1,18 @@
 require "journey"
 
 describe Journey do
-  subject(:station) {Station.new("Brixton", 2)}
   subject(:journey) {described_class.new(station)}
-  subject(:station2) {Station.new("Southwark", 1)}
-  it "journey should be created with entry station name" do
+
+  let (:station) {double('station', name: "King's Cross", zone: 1)}
+  let (:station2) {double('station2', name: "Holborn", zone: 1)}
+
+  it "Journey should be created with entry station name" do
     expect(journey.entry_station).to eq station.name
   end
-  it "journey should end with exit station name" do
-    expect(journey.exit_station).to eq station2.name
+
+  it "Exit station can be updated" do
+    journey.exit_station = station2.name
+    expect(journey.exit_station).to be station2.name
   end
+
 end
