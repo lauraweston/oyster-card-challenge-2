@@ -6,6 +6,6 @@ group :test do
   "rspec"
 end
 
-group  :development do
+group :development do
   "rspec"
 end
