@@ -3,9 +3,10 @@ require "oyster_card"
 
 describe OysterCard do
   subject(:oystercard) {described_class.new}
-  let (:station) {double('station', name: "King's Cross")}
-  let (:station2) {double('station2', name: "Holborn")}
+  let (:station) {double :station, name: "King's Cross", zone: 1}
+  let (:station2) {double :station2, name: "Holborn", zone: 1}
   let (:journey) {double :journey }
+  let(:journey_log) {double :journey_log }
 
   it "has a default balance of 0" do
     expect(oystercard.balance).to eq(0)

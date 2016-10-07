@@ -1,14 +1,11 @@
-require 'journey'
-
 class JourneyLog
-  attr_reader :current_journey, :journeys
+
+  attr_reader :journeys
 
   def initialize
-    @current_journey = Journey.new
     @journeys = []
+    @journey = journey_class
+
   end
 
-  def update_log
-    journeys << current_journey
-  end
 end

@@ -38,7 +38,7 @@ class OysterCard
     reset_current_journey
   end
 
-  def  double_entry?
+  def double_entry?
     current_journey.entry_station != nil
   end
 
