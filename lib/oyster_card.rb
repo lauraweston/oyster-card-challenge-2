@@ -34,7 +34,7 @@ class OysterCard
   private
   def finish_journey
     deduct(current_journey.fare)
-    update_log(current_journey)
+    update_log
     reset_current_journey
   end
 
@@ -58,8 +58,8 @@ class OysterCard
     balance < MINIMUM_BALANCE
   end
 
-  def update_log(journey)
-    @journey_log << journey
+  def update_log
+    @journey_log << current_journey
   end
 
   def reset_current_journey
