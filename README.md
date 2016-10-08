@@ -56,7 +56,7 @@ In order to be charged the correct amount
 As a customer
 I need to have the correct fare calculated
 ```
-Example input
+Example in irb
 -------------
 ```
 2.3.0 :010 > bank = Station.new("bank", 1)
