@@ -1,68 +1,46 @@
-#require_relative "station"
-require_relative "journey"
-
 class OysterCard
-  attr_reader :balance, :in_journey, :current_journey, :journey_log
-
   MAX_LIMIT = 90
   MINIMUM_BALANCE = 1
 
+  attr_reader :balance
 
-  def initialize
+  def initialize(journey_log)
       @balance = 0
-      @in_journey = false
-      @current_journey = Journey.new
-      @journey_log = []
+      @journey_log = journey_log
   end
 
   def top_up(amount)
-    raise max_limit if limit_reached?(balance + amount)
+    raise max_limit_error if limit_reached?(balance + amount)
     @balance += amount
   end
 
   def touch_in(station)
-    finish_journey if double_entry?
-    raise "You don't have enough money" if insufficient_funds?
-    current_journey.entry_station = station
+    raise "Please top up the card" if insufficient_funds?
+    journey_cost = journey_log.start(station)
+    deduct(journey_cost)
   end
 
   def touch_out(station)
-    current_journey.exit_station = station
-    finish_journey
+    journey_cost = journey_log.finish(station)
+    deduct(journey_cost)
   end
 
   private
-  def finish_journey
-    deduct(current_journey.fare)
-    update_log
-    reset_current_journey
-  end
-
-  def double_entry?
-    current_journey.entry_station != nil
-  end
+  attr_reader :journey_log
 
   def deduct(amount)
     @balance -= amount
   end
 
-  def max_limit
+  def max_limit_error
     "The maximum amount allowed on the card is £#{MAX_LIMIT}"
   end
 
   def limit_reached?(amount)
-    (amount) > MAX_LIMIT
+    amount > MAX_LIMIT
   end
 
   def insufficient_funds?
     balance < MINIMUM_BALANCE
-  end
-
-  def update_log
-    @journey_log << current_journey
-  end
-
-  def reset_current_journey
-    @current_journey = Journey.new
   end
 end
